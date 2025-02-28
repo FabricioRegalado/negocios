@@ -1,134 +1,231 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Menu = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showAll, setShowAll] = useState(false);
+  // Estados generales
   const [theme, setTheme] = useState("dark");
+  const [activeCategory, setActiveCategory] = useState("Hamburguesas");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedModifications, setSelectedModifications] = useState([]);
+  const [selectedExtras, setSelectedExtras] = useState([]);
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
 
-  // Colores base
-  const primaryColor = "#2C3E50"; // Azul grisáceo oscuro
-  const accentColor = "#E74C3C";  // Rojo de acento
+  // Colores basados en tonos amarillos
+  const yellowBase = "#F1C40F"; // Amarillo vibrante
+  const accentColor = "#F39C12"; // Amarillo oscuro
   const white = "#FFFFFF";
+  const darkText = "#2C3E50";
 
-  // Definición de temas
+  // Definición de temas (oscuro y claro)
   const themes = {
     dark: {
-      backgroundColor: "#1A1A1A",
-      glassBg: "rgba(255,255,255,0.15)",
-      borderColor: "rgba(255,255,255,0.25)",
+      backgroundColor: "#1F1F1F",
+      glassBg: "rgba(241,196,15,0.2)",
+      borderColor: "rgba(241,196,15,0.3)",
       textColor: white,
-      headerGradient: "bg-gradient-to-r from-[#2C3E50] to-[#34495E]",
-      footerGradient: "bg-gradient-to-r from-[#34495E] to-[#2C3E50]",
+      headerGradient: "bg-gradient-to-r from-[#F1C40F] to-[#F39C12]",
+      footerGradient: "bg-gradient-to-r from-[#F39C12] to-[#F1C40F]",
     },
     light: {
-      backgroundColor: "#ECF0F1",
-      glassBg: "rgba(255,255,255,0.9)",
-      borderColor: "rgba(0,0,0,0.1)",
-      textColor: primaryColor,
-      headerGradient: "bg-gradient-to-r from-[#ECF0F1] to-[#BDC3C7]",
-      footerGradient: "bg-gradient-to-r from-[#BDC3C7] to-[#ECF0F1]",
+      backgroundColor: "#FFF9E6",
+      glassBg: "rgba(255,249,230,0.8)",
+      borderColor: "rgba(241,196,15,0.5)",
+      textColor: darkText,
+      headerGradient: "bg-gradient-to-r from-[#F1C40F] to-[#F39C12]",
+      footerGradient: "bg-gradient-to-r from-[#F39C12] to-[#F1C40F]",
     },
   };
 
   const themeStyles = themes[theme];
 
-  // Ejemplos de productos (6 platillos)
-  const products = [
-    { id: 1, name: "Mega Deluxe", price: "$12.99", image: "🍔", description: "Triple carne angus, queso azul y bacon ahumado", rating: 4.9, tags: ["TOP", "NUEVO"], details: "Incluye papas gourmet y salsa especial", variants: ["+Doble Queso $2", "+Guacamole $3"] },
-    { id: 2, name: "Hot Dog Clásico", price: "$8.99", image: "🌭", description: "Salchicha artesanal con aderezos especiales", rating: 4.5, tags: ["POPULAR"], details: "Acompañado de papas fritas", variants: ["+Queso $1.5", "+Tocino $2"] },
-    { id: 3, name: "Boneless Crispy", price: "$10.99", image: "🍗", description: "Boneless empanizados con salsa especial", rating: 4.7, tags: ["CRUJIENTE"], details: "Incluye papas y bebida", variants: ["+Salsa BBQ $1", "+Extra crujiente $2"] },
-    { id: 4, name: "Combo Fiesta", price: "$15.99", image: "🥤🍟", description: "Hamburguesa, papas y bebida", rating: 4.8, tags: ["OFERTA"], details: "Combo completo para compartir", variants: ["+Refresco extra $1", "+Papas extra $1.5"] },
-    { id: 5, name: "Wrap Vegetariano", price: "$9.99", image: "🌯", description: "Wrap lleno de vegetales frescos y hummus", rating: 4.6, tags: ["SALUDABLE"], details: "Ideal para una comida ligera", variants: ["+Queso vegano $1"] },
-    { id: 6, name: "Ensalada César", price: "$7.99", image: "🥗", description: "Ensalada clásica con pollo a la parrilla", rating: 4.4, tags: ["FRESCA"], details: "Con crutones y aderezo César", variants: ["+Pollo extra $2"] },
+  // Opciones para personalización
+  const modificationsOptions = [
+    "Sin cebolla",
+    "Sin queso",
+    "Sin pepinillos",
+    "Extra salsa",
+    "Extra carne",
   ];
 
-  const totalProducts = products.length;
-  const currentProduct = products[currentIndex];
+  const extrasOptions = [
+    "Queso Amarillo",
+    "Queso Manchego",
+    "Queso Asadero",
+    "Piña",
+    "Panela",
+    "Pepperoni",
+    "Salchicha",
+    "Rajas",
+    "Carne de Res",
+    "Champiñones",
+    "Queso Fundido Normal",
+    "Queso Fundido BBQ",
+    "Queso Fundido Hongo y Tierra",
+    "Queso Fundido Mango Habanero",
+    "Queso Fundido Piña Habanero",
+    "Queso Fundido Buffalo",
+    "Queso Fundido Pizza",
+  ];
 
-  const nextProduct = () => setCurrentIndex((prev) => (prev + 1) % totalProducts);
-  const prevProduct = () => setCurrentIndex((prev) => (prev - 1 + totalProducts) % totalProducts);
-  const orderWhatsApp = () => window.open("https://wa.me/3411456773", "_blank");
+  // Función para agregar el producto personalizado al carrito
+  const addToCart = () => {
+    if (selectedProduct) {
+      const item = {
+        product: selectedProduct,
+        modifications: selectedModifications,
+        extras: selectedExtras,
+      };
+      setCart([...cart, item]);
+      setSelectedProduct(null);
+      setSelectedModifications([]);
+      setSelectedExtras([]);
+    }
+  };
+
+  // Función para confirmar el pedido del carrito y redirigir a WhatsApp
+  const confirmCartOrder = () => {
+    if (cart.length === 0) return;
+    let message = "Hola, quiero pedir:\n";
+    cart.forEach((item) => {
+      const mods = item.modifications.length > 0 ? " (" + item.modifications.join(", ") + ")" : "";
+      const extras = item.extras.length > 0 ? " Extras: " + item.extras.join(", ") : "";
+      message += `- ${item.product.name}${mods}${extras} - ${item.product.price}\n`;
+    });
+    message += "Cada platillo incluye papas.";
+    window.open("https://wa.me/3411456773?text=" + encodeURIComponent(message), "_blank");
+    setCart([]);
+    setShowCart(false);
+  };
+
+  // Datos del menú divididos en categorías
+  const menuData = {
+    Hamburguesas: [
+      { name: "Hamburguesa Res", price: "$65", image: "🍔", description: "Clásica con carne de res" },
+      { name: "Hamburguesa Tropical", price: "$75", image: "🍔", description: "Carne con piña y aderezos" },
+      { name: "Hamburguesa Sencilla", price: "$65", image: "🍔", description: "Opción básica con queso" },
+      { name: "Hamburguesa Panela", price: "$70", image: "🍔", description: "Carne y queso panela a la plancha" },
+      { name: "Hamburguesa Pollo", price: "$65", image: "🍔", description: "Pollo empanizado crujiente" },
+      { name: "Hamburguesa Piña Habanero", price: "$80", image: "🍔", description: "Toque picante y dulce" },
+      { name: "Hamburguesa Buffalo", price: "$75", image: "🍔", description: "Salsa buffalo intensa" },
+      { name: "Hamburguesa BBQ", price: "$70", image: "🍔", description: "Carne bañada en salsa BBQ" },
+      { name: "Hamburguesa Hawaiana", price: "$75", image: "🍔", description: "Jamón, piña y queso fundido" },
+      { name: "Hamburguesa Mar y Tierra", price: "$85", image: "🍔", description: "Carne + camarón, perfecta combinación" },
+      { name: "Hamburguesa Árabe", price: "$70", image: "🍔", description: "Con especias y salsas estilo árabe" },
+      { name: "Hamburguesa Camarón", price: "$90", image: "🍔", description: "Camarones empanizados especiales" },
+    ],
+    Hotdogs: [
+      { name: "HotDog Normal", price: "$30", image: "🌭", description: "Clásico con salchicha y aderezos" },
+      { name: "HotDog Campesino", price: "$40", image: "🌭", description: "Con verduras y queso gratinado" },
+      { name: "HotDog Gorrion", price: "$35", image: "🌭", description: "Con papas a la francesa" },
+      { name: "HotDog Papas", price: "$40", image: "🌭", description: "Con papas fritas y salsa especial" },
+      { name: "HotDog Sinaloa", price: "$55", image: "🌭", description: "Estilo Sinaloa con jalapeños" },
+      { name: "HotDog Pizza", price: "$60", image: "🌭", description: "Salsa de tomate, pepperoni y queso" },
+    ],
+    Alitas: [
+      { name: "Alitas (10 piezas)", price: "$80", image: "🍗", description: "10 piezas con salsa BBQ o Buffalo" },
+    ],
+    Extras: [
+      { name: "Queso Amarillo", price: "$10", image: "🧀", description: "Porción adicional" },
+      { name: "Queso Manchego", price: "$10", image: "🧀", description: "Porción de queso manchego" },
+      { name: "Queso Asadero", price: "$10", image: "🧀", description: "Porción de queso asadero" },
+      { name: "Piña", price: "$10", image: "🍍", description: "Extra de piña" },
+      { name: "Panela", price: "$10", image: "🧀", description: "Queso panela asado" },
+      { name: "Pepperoni", price: "$10", image: "🍕", description: "Rebanadas de pepperoni" },
+      { name: "Salchicha", price: "$10", image: "🌭", description: "Extra de salchicha" },
+      { name: "Rajas", price: "$10", image: "🌶", description: "Rajas de chile poblano" },
+      { name: "Carne de Res", price: "$10", image: "🥩", description: "Extra de carne" },
+      { name: "Champiñones", price: "$10", image: "🍄", description: "Porción de champiñones" },
+      { name: "Queso Fundido Normal", price: "$60", image: "🧀", description: "Clásico queso fundido" },
+      { name: "Queso Fundido BBQ", price: "$80", image: "🧀", description: "Con salsa BBQ" },
+      { name: "Queso Fundido Hongo y Tierra", price: "$80", image: "🧀", description: "Champiñones y carne" },
+      { name: "Queso Fundido Mango Habanero", price: "$80", image: "🧀", description: "Agridulce y picante" },
+      { name: "Queso Fundido Piña Habanero", price: "$80", image: "🧀", description: "Fusión de piña y chile" },
+      { name: "Queso Fundido Buffalo", price: "$80", image: "🧀", description: "Con salsa buffalo" },
+      { name: "Queso Fundido Pizza", price: "$70", image: "🧀", description: "Con pepperoni y salsa de tomate" },
+    ],
+    Bebidas: [
+      { name: "Aguas Frescas", price: "$20", image: "🥤", description: "Sabor del día" },
+      { name: "Refrescos", price: "$20", image: "🥤", description: "Variedad de refrescos" },
+    ],
+  };
+
+  const currentItems = menuData[activeCategory] || [];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeCategory]);
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-500 ease-in-out" style={{ backgroundColor: themeStyles.backgroundColor }}>
-      {/* Header refinado con transición */}
-      <header className={`sticky top-0 z-50 m-4 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-500 ease-in-out ${themeStyles.headerGradient}`}>
+      {/* Header */}
+      <header className={`sticky top-0 z-50 m-4 p-6 rounded-xl shadow-lg backdrop-blur-md transition-all duration-500 ease-in-out ${themeStyles.headerGradient}`}>
         <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-extrabold transition-colors duration-500 ease-in-out" style={{ color: themeStyles.textColor }}>
-            BURGER MASTERS
-          </h1>
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-3 rounded-full transition-transform hover:scale-110 shadow-lg"
-            style={{
-              background: "linear-gradient(45deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))",
-              border: `1px solid ${themeStyles.borderColor}`,
-            }}
-          >
-            {theme === "dark" ? "☀" : "🌙"}
-          </button>
+          <div>
+            <h1 className="text-4xl font-extrabold transition-colors duration-500 ease-in-out" style={{ color: themeStyles.textColor }}>
+              MONCHIES BURGERS
+            </h1>
+            <p className="text-sm font-medium" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
+              Del sabor a la perfección
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-3 rounded-full transition-transform hover:scale-110 shadow-lg"
+              style={{ background: "linear-gradient(45deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))", border: `1px solid ${themeStyles.borderColor}` }}
+            >
+              {theme === "dark" ? "☀" : "🌙"}
+            </button>
+            <button
+              onClick={() => setShowCart(true)}
+              className="p-3 rounded-full transition-transform hover:scale-110 shadow-lg"
+              style={{ background: "linear-gradient(45deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))", border: `1px solid ${themeStyles.borderColor}` }}
+            >
+              Cart ({cart.length})
+            </button>
+          </div>
         </div>
+        {/* Categorías */}
+        <nav className="mt-4 flex gap-2 flex-wrap">
+          {Object.keys(menuData).map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`transition-transform hover:scale-105 px-4 py-2 rounded-full font-bold shadow-lg ${activeCategory === cat ? "scale-110" : ""}`}
+              style={{
+                background: activeCategory === cat ? `linear-gradient(45deg, ${yellowBase}, #D4AC0D)` : themeStyles.glassBg,
+                color: activeCategory === cat ? white : themeStyles.textColor,
+                border: `1px solid ${themeStyles.borderColor}`,
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </nav>
       </header>
 
-      {/* Contenido principal: Carrusel o Grid */}
-      {!showAll ? (
-        <div className="flex-1 flex flex-col items-center justify-center px-4">
-          <div className="relative w-full max-w-lg">
-            <button
-              onClick={prevProduct}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 p-4 rounded-full transition-transform hover:scale-110 shadow-lg"
-              style={{ backgroundColor: themeStyles.glassBg, border: `1px solid ${themeStyles.borderColor}` }}
-            >
-              {"<"}
-            </button>
+      {/* Main: Productos */}
+      <main className="flex-1 px-4 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {currentItems.map((item, index) => (
             <div
-              className="card mx-auto transition-transform duration-500 hover:scale-105"
+              key={index}
+              className="transition-transform duration-300 hover:scale-110 relative p-6"
               style={{
                 backgroundColor: themeStyles.glassBg,
-                border: `2px solid transparent`,
+                border: `1px solid ${themeStyles.borderColor}`,
                 borderRadius: "1rem",
-                backgroundImage: `linear-gradient(${themeStyles.glassBg}, ${themeStyles.glassBg}), linear-gradient(45deg, ${accentColor}, ${primaryColor})`,
-                backgroundOrigin: "border-box",
-                backgroundClip: "content-box, border-box",
                 backdropFilter: "blur(10px)",
               }}
             >
-              <div className="p-8 text-center">
-                <div className="mb-6">
-                  <span className="text-9xl animate-bounce">{currentProduct.image}</span>
-                </div>
-                <h2 className="text-4xl font-bold mb-2" style={{ color: themeStyles.textColor }}>
-                  {currentProduct.name}
-                </h2>
-                <p className="text-lg mb-4" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
-                  {currentProduct.description}
-                </p>
-                <div className="flex items-center justify-center gap-2 mb-4" style={{ color: accentColor }}>
-                  <span className="font-bold">{currentProduct.rating}</span>
-                </div>
-                <p className="text-3xl font-bold mb-4" style={{ color: accentColor }}>
-                  {currentProduct.price}
-                </p>
-                <div className="flex gap-2 justify-center mb-4">
-                  {currentProduct.tags.map((tag, index) => (
-                    <span key={index} className="px-3 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: primaryColor, color: white }}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <p className="mb-6" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
-                  {currentProduct.details}
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center mb-6">
-                  {currentProduct.variants.map((variant, index) => (
-                    <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: "rgba(44, 62, 80, 0.5)", color: white }}>
-                      {variant}
-                    </span>
-                  ))}
-                </div>
+              <div className="text-center">
+                <div className="mb-4 text-7xl">{item.image}</div>
+                <h3 className="text-2xl font-bold mb-2" style={{ color: themeStyles.textColor }}>{item.name}</h3>
+                <p className="mb-2" style={{ color: themeStyles.textColor, opacity: 0.8 }}>{item.description}</p>
+                <p className="text-xl font-bold mb-2" style={{ color: accentColor }}>{item.price}</p>
                 <button
-                  onClick={orderWhatsApp}
-                  className="transition-transform hover:scale-110 shadow-lg"
+                  onClick={() => setSelectedProduct(item)}
+                  className="transition-transform hover:scale-105 shadow-lg"
                   style={{
                     background: "linear-gradient(45deg, #E74C3C, #C0392B)",
                     color: white,
@@ -140,128 +237,145 @@ const Menu = () => {
                 </button>
               </div>
             </div>
-            <button
-              onClick={nextProduct}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 p-4 rounded-full transition-transform hover:scale-110 shadow-lg"
-              style={{ backgroundColor: themeStyles.glassBg, border: `1px solid ${themeStyles.borderColor}` }}
-            >
-              {">"}
-            </button>
-          </div>
-          <button
-            onClick={() => setShowAll(true)}
-            className="mt-6 transition-transform hover:scale-110 shadow-lg"
-            style={{
-              background: `linear-gradient(45deg, ${primaryColor}, #34495E)`,
-              color: white,
-              padding: "0.75rem 1.5rem",
-              borderRadius: "9999px",
-            }}
-          >
-            Ver todos los platillos
-          </button>
+          ))}
         </div>
-      ) : (
-        <div className="flex-1 px-4 py-8">
-          <div className="mb-6 text-center">
-            <button
-              onClick={() => setShowAll(false)}
-              className="transition-transform hover:scale-110 shadow-lg"
-              style={{
-                background: `linear-gradient(45deg, ${primaryColor}, #34495E)`,
-                color: white,
-                padding: "0.75rem 1.5rem",
-                borderRadius: "9999px",
-              }}
-            >
-              Volver al carrusel
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="card transition-transform duration-300 hover:scale-110"
-                style={{
-                  backgroundColor: themeStyles.glassBg,
-                  border: `1px solid ${themeStyles.borderColor}`,
-                  borderRadius: "1rem",
-                  backdropFilter: "blur(10px)",
-                }}
-              >
-                <div className="p-6 text-center">
-                  <div className="mb-4">
-                    <span className="text-7xl">{product.image}</span>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2" style={{ color: themeStyles.textColor }}>
-                    {product.name}
-                  </h3>
-                  <p className="mb-2" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
-                    {product.description}
-                  </p>
-                  <p className="text-xl font-bold mb-2" style={{ color: accentColor }}>
-                    {product.price}
-                  </p>
-                  <button
-                    onClick={orderWhatsApp}
-                    className="transition-transform hover:scale-110 shadow-lg"
-                    style={{
-                      background: "linear-gradient(45deg, #E74C3C, #C0392B)",
-                      color: white,
-                      padding: "0.75rem 1.5rem",
-                      borderRadius: "9999px",
-                    }}
-                  >
-                    Pedir por WhatsApp
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      </main>
 
-      {/* Indicador de carrusel */}
-      {!showAll && (
-        <div className="flex flex-col items-center mt-6">
-          <div className="flex gap-2">
-            {products.map((_, idx) => (
-              <div
-                key={idx}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${idx === currentIndex ? "scale-125 border-2" : ""}`}
-                style={{ backgroundColor: idx === currentIndex ? white : "#95A5A6", borderColor: accentColor }}
-              ></div>
-            ))}
-          </div>
-          <p className="text-sm mt-2 transition-colors duration-500 ease-in-out" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
-            Desliza para ver más productos
-          </p>
-        </div>
-      )}
-
-      {/* Footer definitivo y atractivo */}
-      <footer
-        className="mt-8 py-4 flex flex-col items-center justify-center gap-2 shadow-md transition-colors duration-500 ease-in-out"
+      {/* Footer */}
+      <footer className="mt-8 py-4 flex flex-col items-center justify-center gap-2 shadow-md transition-colors duration-500 ease-in-out"
         style={{
           background: themeStyles.footerGradient,
           borderTop: `1px solid ${themeStyles.borderColor}`,
           backdropFilter: "blur(10px)",
-        }}
-      >
+        }}>
         <p className="text-sm font-medium" style={{ color: themeStyles.textColor, opacity: 0.9 }}>
           by Ing Informatica Fabricio Regalado
         </p>
-        <a
-          href="https://wa.me/3411456773"
-          target="_blank"
-          rel="noopener noreferrer"
+        <a href="https://wa.me/3411456773" target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-2 text-sm font-bold transition-transform hover:scale-105"
-          style={{ color: accentColor }}
-        >
+          style={{ color: accentColor }}>
           <span style={{ fontSize: "1.2rem" }}>☏</span>
           Tel: 341 145 6773
         </a>
       </footer>
+
+      {/* Modal para personalización */}
+      {selectedProduct && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-xl p-6 w-11/12 max-w-md shadow-xl">
+            <h2 className="text-2xl font-bold mb-4">Personaliza tu pedido</h2>
+            <p className="mb-4">
+              <strong>{selectedProduct.name}</strong> - {selectedProduct.price}
+            </p>
+            
+            {/* Modificaciones */}
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Modificaciones</p>
+              {modificationsOptions.map((option) => (
+                <div key={option} className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    id={`mod-${option}`}
+                    className="mr-2"
+                    checked={selectedModifications.includes(option)}
+                    onChange={() => {
+                      if (selectedModifications.includes(option)) {
+                        setSelectedModifications(selectedModifications.filter((mod) => mod !== option));
+                      } else {
+                        setSelectedModifications([...selectedModifications, option]);
+                      }
+                    }}
+                  />
+                  <label htmlFor={`mod-${option}`} className="text-sm">
+                    {option}
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            {/* Extras */}
+            <div className="mb-4">
+              <p className="font-semibold mb-2">Extras Adicionales</p>
+              {extrasOptions.map((option) => (
+                <div key={option} className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    id={`extra-${option}`}
+                    className="mr-2"
+                    checked={selectedExtras.includes(option)}
+                    onChange={() => {
+                      if (selectedExtras.includes(option)) {
+                        setSelectedExtras(selectedExtras.filter((ex) => ex !== option));
+                      } else {
+                        setSelectedExtras([...selectedExtras, option]);
+                      }
+                    }}
+                  />
+                  <label htmlFor={`extra-${option}`} className="text-sm">
+                    {option}
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <p className="mb-4 text-sm italic">Cada platillo incluye papas.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setSelectedProduct(null);
+                  setSelectedModifications([]);
+                  setSelectedExtras([]);
+                }}
+                className="px-4 py-2 rounded shadow hover:shadow-md transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={addToCart}
+                className="px-4 py-2 rounded bg-green-500 text-white shadow hover:bg-green-600 transition"
+              >
+                Agregar al carrito
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Carrito */}
+      {showCart && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-xl p-6 w-11/12 max-w-lg shadow-xl">
+            <h2 className="text-2xl font-bold mb-4">Tu Carrito</h2>
+            {cart.length === 0 ? (
+              <p className="mb-4">Tu carrito está vacío.</p>
+            ) : (
+              <div className="mb-4">
+                {cart.map((item, idx) => (
+                  <div key={idx} className="mb-2 border-b pb-2">
+                    <p className="font-semibold">{item.product.name} - {item.product.price}</p>
+                    {item.modifications.length > 0 && (
+                      <p className="text-sm">Modificaciones: {item.modifications.join(", ")}</p>
+                    )}
+                    {item.extras.length > 0 && (
+                      <p className="text-sm">Extras: {item.extras.join(", ")}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowCart(false)} className="px-4 py-2 rounded shadow hover:shadow-md transition">
+                Cerrar
+              </button>
+              {cart.length > 0 && (
+                <button onClick={confirmCartOrder} className="px-4 py-2 rounded bg-green-500 text-white shadow hover:bg-green-600 transition">
+                  Confirmar Pedido
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
