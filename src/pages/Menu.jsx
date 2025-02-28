@@ -7,6 +7,7 @@ const Menu = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedModifications, setSelectedModifications] = useState([]);
   const [selectedExtras, setSelectedExtras] = useState([]);
+  const [selectedDrink, setSelectedDrink] = useState("");
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
 
@@ -16,8 +17,8 @@ const Menu = () => {
   const white = "#FFFFFF";
   const darkText = "#2C3E50";
 
-  // Definición de temas (oscuro y claro)
-  const themes = {
+  // Temas (oscuro y claro) usando tonos amarillos
+  const themesConfig = {
     dark: {
       backgroundColor: "#1F1F1F",
       glassBg: "rgba(241,196,15,0.2)",
@@ -36,7 +37,7 @@ const Menu = () => {
     },
   };
 
-  const themeStyles = themes[theme];
+  const themeStyles = themesConfig[theme];
 
   // Opciones para personalización
   const modificationsOptions = [
@@ -60,37 +61,45 @@ const Menu = () => {
     "Champiñones",
   ];
 
-  // Función para agregar el producto personalizado al carrito
-  const addToCart = () => {
+  // Función para abrir WhatsApp con mensaje predefinido
+  const orderWhatsApp = (message) =>
+    window.open("https://wa.me/3411456773?text=" + encodeURIComponent(message), "_blank");
+
+  // Función para agregar producto personalizado al carrito
+  const addToCart = (customization) => {
     if (selectedProduct) {
       const item = {
         product: selectedProduct,
-        modifications: selectedModifications,
-        extras: selectedExtras,
+        modifications: customization.modifications || [],
+        extras: customization.extras || [],
+        selectedDrink: customization.selectedDrink || "",
       };
       setCart([...cart, item]);
+      // Para depuración:
+      console.log("Producto agregado:", item);
       setSelectedProduct(null);
       setSelectedModifications([]);
       setSelectedExtras([]);
+      setSelectedDrink("");
     }
   };
 
-  // Función para confirmar el pedido del carrito y redirigir a WhatsApp
+  // Función para confirmar el pedido del carrito
   const confirmCartOrder = () => {
     if (cart.length === 0) return;
     let message = "Hola, quiero pedir:\n";
     cart.forEach((item) => {
       const mods = item.modifications.length > 0 ? " (" + item.modifications.join(", ") + ")" : "";
       const extras = item.extras.length > 0 ? " Extras: " + item.extras.join(", ") : "";
-      message += `- ${item.product.name}${mods}${extras} - ${item.product.price}\n`;
+      const drink = item.selectedDrink ? " Refresco: " + item.selectedDrink : "";
+      message += `- ${item.product.name}${mods}${extras}${drink} - ${item.product.price}\n`;
     });
-    message += "Cada platillo incluye papas.";
-    window.open("https://wa.me/3411456773?text=" + encodeURIComponent(message), "_blank");
+    orderWhatsApp(message);
     setCart([]);
     setShowCart(false);
   };
 
-  // Datos del menú divididos en categorías
+  // Datos del menú
   const menuData = {
     Hamburguesas: [
       { name: "Hamburguesa Res", price: "$65", image: "🍔", description: "Clásica con carne de res" },
@@ -128,17 +137,13 @@ const Menu = () => {
       { name: "Rajas", price: "$10", image: "🌶", description: "Rajas de chile poblano" },
       { name: "Carne de Res", price: "$10", image: "🥩", description: "Extra de carne" },
       { name: "Champiñones", price: "$10", image: "🍄", description: "Porción de champiñones" },
-      { name: "Queso Fundido Normal", price: "$60", image: "🧀", description: "Clásico queso fundido" },
-      { name: "Queso Fundido BBQ", price: "$80", image: "🧀", description: "Con salsa BBQ" },
-      { name: "Queso Fundido Hongo y Tierra", price: "$80", image: "🧀", description: "Champiñones y carne" },
-      { name: "Queso Fundido Mango Habanero", price: "$80", image: "🧀", description: "Agridulce y picante" },
-      { name: "Queso Fundido Piña Habanero", price: "$80", image: "🧀", description: "Fusión de piña y chile" },
-      { name: "Queso Fundido Buffalo", price: "$80", image: "🧀", description: "Con salsa buffalo" },
-      { name: "Queso Fundido Pizza", price: "$70", image: "🧀", description: "Con pepperoni y salsa de tomate" },
     ],
     Bebidas: [
-      { name: "Aguas Frescas", price: "$20", image: "🥤", description: "Sabor del día" },
-      { name: "Refrescos", price: "$20", image: "🥤", description: "Variedad de refrescos" },
+      { name: "Aguas Frescas", price: "$20", image: "🥤", description: "Sabor del día", type: "direct" },
+      { name: "Coca", price: "$20", image: "🥤", description: "Coca Cola", type: "direct" },
+      { name: "Sprite", price: "$20", image: "🥤", description: "Sprite", type: "direct" },
+      { name: "Fanta", price: "$20", image: "🥤", description: "Fanta", type: "direct" },
+      { name: "Fresca", price: "$20", image: "🥤", description: "Fresca", type: "direct" },
     ],
   };
 
@@ -178,7 +183,7 @@ const Menu = () => {
             </button>
           </div>
         </div>
-        {/* Categorías */}
+        {/* Barra de Categorías */}
         <nav className="mt-4 flex gap-2 flex-wrap">
           {Object.keys(menuData).map((cat) => (
             <button
@@ -197,7 +202,7 @@ const Menu = () => {
         </nav>
       </header>
 
-      {/* Main: Productos */}
+      {/* Main: Grid de Productos */}
       <main className="flex-1 px-4 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {currentItems.map((item, index) => (
@@ -217,7 +222,13 @@ const Menu = () => {
                 <p className="mb-2" style={{ color: themeStyles.textColor, opacity: 0.8 }}>{item.description}</p>
                 <p className="text-xl font-bold mb-2" style={{ color: accentColor }}>{item.price}</p>
                 <button
-                  onClick={() => setSelectedProduct(item)}
+                  onClick={() => {
+                    if (activeCategory === "Bebidas" && item.type === "direct") {
+                      setCart([...cart, { product: item, modifications: [], extras: [], selectedDrink: "" }]);
+                    } else {
+                      setSelectedProduct(item);
+                    }
+                  }}
                   className="transition-transform hover:scale-105 shadow-lg"
                   style={{
                     background: "linear-gradient(45deg, #E74C3C, #C0392B)",
@@ -252,7 +263,7 @@ const Menu = () => {
         </a>
       </footer>
 
-      {/* Modal para personalización */}
+      {/* Modal de Personalización */}
       {selectedProduct && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-xl p-6 w-11/12 max-w-md shadow-xl">
@@ -260,71 +271,90 @@ const Menu = () => {
             <p className="mb-4">
               <strong>{selectedProduct.name}</strong> - {selectedProduct.price}
             </p>
-            
-            {/* Modificaciones */}
-            <div className="mb-4">
-              <p className="font-semibold mb-2">Modificaciones</p>
-              {modificationsOptions.map((option) => (
-                <div key={option} className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    id={`mod-${option}`}
-                    className="mr-2"
-                    checked={selectedModifications.includes(option)}
-                    onChange={() => {
-                      if (selectedModifications.includes(option)) {
-                        setSelectedModifications(selectedModifications.filter((mod) => mod !== option));
-                      } else {
-                        setSelectedModifications([...selectedModifications, option]);
-                      }
-                    }}
-                  />
-                  <label htmlFor={`mod-${option}`} className="text-sm">
-                    {option}
-                  </label>
+            {selectedProduct.drinkOptions ? (
+              <div className="mb-4">
+                <p className="font-semibold mb-2">Selecciona tu refresco:</p>
+                {selectedProduct.drinkOptions.map((option) => (
+                  <div key={option} className="flex items-center mb-2">
+                    <input
+                      type="radio"
+                      id={`drink-${option}`}
+                      name="drinkOption"
+                      className="mr-2"
+                      checked={selectedDrink === option}
+                      onChange={() => setSelectedDrink(option)}
+                    />
+                    <label htmlFor={`drink-${option}`} className="text-sm">{option}</label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className="mb-4">
+                  <p className="font-semibold mb-2">Modificaciones</p>
+                  {modificationsOptions.map((option) => (
+                    <div key={option} className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id={`mod-${option}`}
+                        className="mr-2"
+                        checked={selectedModifications.includes(option)}
+                        onChange={() => {
+                          if (selectedModifications.includes(option)) {
+                            setSelectedModifications(selectedModifications.filter((mod) => mod !== option));
+                          } else {
+                            setSelectedModifications([...selectedModifications, option]);
+                          }
+                        }}
+                      />
+                      <label htmlFor={`mod-${option}`} className="text-sm">{option}</label>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-
-            {/* Extras */}
-            <div className="mb-4">
-              <p className="font-semibold mb-2">Extras Adicionales</p>
-              {extrasOptions.map((option) => (
-                <div key={option} className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    id={`extra-${option}`}
-                    className="mr-2"
-                    checked={selectedExtras.includes(option)}
-                    onChange={() => {
-                      if (selectedExtras.includes(option)) {
-                        setSelectedExtras(selectedExtras.filter((ex) => ex !== option));
-                      } else {
-                        setSelectedExtras([...selectedExtras, option]);
-                      }
-                    }}
-                  />
-                  <label htmlFor={`extra-${option}`} className="text-sm">
-                    {option}
-                  </label>
+                <div className="mb-4">
+                  <p className="font-semibold mb-2">Extras Adicionales</p>
+                  {extrasOptions.map((option) => (
+                    <div key={option} className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id={`extra-${option}`}
+                        className="mr-2"
+                        checked={selectedExtras.includes(option)}
+                        onChange={() => {
+                          if (selectedExtras.includes(option)) {
+                            setSelectedExtras(selectedExtras.filter((ex) => ex !== option));
+                          } else {
+                            setSelectedExtras([...selectedExtras, option]);
+                          }
+                        }}
+                      />
+                      <label htmlFor={`extra-${option}`} className="text-sm">{option}</label>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-
-            <p className="mb-4 text-sm italic">Cada platillo incluye papas.</p>
+              </>
+            )}
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => {
                   setSelectedProduct(null);
                   setSelectedModifications([]);
                   setSelectedExtras([]);
+                  setSelectedDrink("");
                 }}
                 className="px-4 py-2 rounded shadow hover:shadow-md transition"
               >
                 Cancelar
               </button>
               <button
-                onClick={addToCart}
+                onClick={() => {
+                  if (selectedProduct.drinkOptions && !selectedDrink) return;
+                  addToCart({
+                    modifications: selectedModifications,
+                    extras: selectedExtras,
+                    selectedDrink: selectedDrink,
+                  });
+                }}
                 className="px-4 py-2 rounded bg-green-500 text-white shadow hover:bg-green-600 transition"
               >
                 Agregar al carrito
@@ -334,11 +364,11 @@ const Menu = () => {
         </div>
       )}
 
-      {/* Modal de Carrito */}
+      {/* Modal del Carrito */}
       {showCart && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-xl p-6 w-11/12 max-w-lg shadow-xl">
-            <h2 className="text-2xl font-bold mb-4">Tu Carrito</h2>
+            <h2 className="text-2xl font-bold mb-4">¡Envía tu Pedido!</h2>
             {cart.length === 0 ? (
               <p className="mb-4">Tu carrito está vacío.</p>
             ) : (
@@ -352,6 +382,9 @@ const Menu = () => {
                     {item.extras.length > 0 && (
                       <p className="text-sm">Extras: {item.extras.join(", ")}</p>
                     )}
+                    {item.selectedDrink && (
+                      <p className="text-sm">Refresco: {item.selectedDrink}</p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -362,7 +395,7 @@ const Menu = () => {
               </button>
               {cart.length > 0 && (
                 <button onClick={confirmCartOrder} className="px-4 py-2 rounded bg-green-500 text-white shadow hover:bg-green-600 transition">
-                  Confirmar Pedido
+                  Enviar Pedido
                 </button>
               )}
             </div>
