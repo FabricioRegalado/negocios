@@ -58,13 +58,6 @@ const Menu = () => {
     "Rajas",
     "Carne de Res",
     "Champiñones",
-    "Queso Fundido Normal",
-    "Queso Fundido BBQ",
-    "Queso Fundido Hongo y Tierra",
-    "Queso Fundido Mango Habanero",
-    "Queso Fundido Piña Habanero",
-    "Queso Fundido Buffalo",
-    "Queso Fundido Pizza",
   ];
 
   // Función para agregar el producto personalizado al carrito
