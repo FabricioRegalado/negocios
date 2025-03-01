@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { FaPlusCircle, FaShoppingCart, FaTrashAlt, FaWhatsapp, FaCheckCircle } from "react-icons/fa";
+import { FaPlusCircle, FaShoppingCart, FaTrashAlt, FaWhatsapp, FaCheckCircle, FaSpinner } from "react-icons/fa";
 import { MdWbSunny, MdNightsStay } from "react-icons/md";
 
 const Menu = () => {
+  // Estado para pantalla de carga
+  const [loading, setLoading] = useState(true);
+
   // Estados generales
   const [theme, setTheme] = useState("dark");
   const [activeCategory, setActiveCategory] = useState("Hamburguesas");
@@ -12,15 +15,14 @@ const Menu = () => {
   const [selectedDrink, setSelectedDrink] = useState("");
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
-  const [showPopup, setShowPopup] = useState(false); // Para manejar el popup
 
   // Colores basados en tonos amarillos
-  const yellowBase = "#F1C40F"; // Amarillo vibrante
-  const accentColor = "#F39C12"; // Amarillo oscuro
+  const yellowBase = "#F1C40F";
+  const accentColor = "#F39C12";
   const white = "#FFFFFF";
   const darkText = "#2C3E50";
 
-  // Definición de temas (oscuro y claro) usando tonos amarillos
+  // Temas (oscuro y claro)
   const themesConfig = {
     dark: {
       backgroundColor: "#1F1F1F",
@@ -42,7 +44,7 @@ const Menu = () => {
 
   const themeStyles = themesConfig[theme];
 
-  // Opciones para personalización (Modificaciones)
+  // Opciones para personalización genéricas
   const modificationsOptions = [
     "Sin cebolla",
     "Sin queso",
@@ -62,7 +64,15 @@ const Menu = () => {
     "Sin mayonesa",
   ];
 
-  // Opciones de Extras (para productos que no sean bebidas)
+  // Opciones específicas para Hotdogs
+  const modificationsOptionsHotdogs = [
+    "Sin cebolla",
+    "Sin catsup",
+    "Sin mostaza",
+    "Sin mayonesa",
+  ];
+
+  // Opciones de Extras genéricas (para otros productos)
   const extrasOptions = [
     "Queso Amarillo",
     "Queso Manchego",
@@ -76,11 +86,19 @@ const Menu = () => {
     "Champiñones",
   ];
 
-  // Función para abrir WhatsApp con mensaje predefinido
+  // Opciones de Extras para Hotdogs
+  const extrasOptionsHotdogs = [
+    "Queso",
+    "Bacon",
+    "Chiles",
+    "Extra salchicha",
+  ];
+
+  // Función para abrir WhatsApp
   const orderWhatsApp = (message) =>
     window.open("https://wa.me/3411456773?text=" + encodeURIComponent(message), "_blank");
 
-  // Función para agregar producto personalizado al carrito
+  // Agregar producto al carrito
   const addToCart = (customization) => {
     if (selectedProduct) {
       const item = {
@@ -98,23 +116,23 @@ const Menu = () => {
     }
   };
 
-  // Función para eliminar un producto del carrito
+  // Eliminar producto del carrito
   const removeFromCart = (indexToRemove) => {
     setCart(cart.filter((_, index) => index !== indexToRemove));
   };
 
-  // Función para calcular el total de un ítem (suponiendo $10 por cada extra)
+  // Calcular total de un ítem (suponiendo $10 por extra)
   const calculateItemTotal = (item) => {
     const base = parseFloat(item.product.price.replace("$", ""));
     const extrasCost = item.extras.length * 10;
     return base + extrasCost;
   };
 
-  // Función para calcular el total del carrito
+  // Total del carrito
   const calculateCartTotal = () =>
     cart.reduce((acc, item) => acc + calculateItemTotal(item), 0);
 
-  // Función para confirmar el pedido del carrito
+  // Confirmar pedido
   const confirmCartOrder = () => {
     if (cart.length === 0) return;
     let message = "Hola, quiero pedir:\n";
@@ -134,8 +152,7 @@ const Menu = () => {
     setShowCart(false);
   };
 
-  // Datos del menú, divididos en categorías.
-  // En Bebidas, cada refresco se maneja como una card independiente.
+  // Datos del menú
   const menuData = {
     Hamburguesas: [
       { name: "Hamburguesa Res", price: "$65", image: "🍔", description: "Clásica con carne de res" },
@@ -189,27 +206,31 @@ const Menu = () => {
     window.scrollTo(0, 0);
   }, [activeCategory]);
 
+  // Simulación de carga (Splash Screen)
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-yellow-400 via-orange-400 to-red-400">
+        <FaSpinner className="text-white text-8xl animate-spin" />
+        <h2 className="mt-4 text-3xl text-white font-bold">Cargando...</h2>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="min-h-screen flex flex-col transition-colors duration-500 ease-in-out"
-      style={{ backgroundColor: themeStyles.backgroundColor }}
-    >
+    <div className="min-h-screen flex flex-col transition-colors duration-500 ease-in-out" style={{ backgroundColor: themeStyles.backgroundColor }}>
       {/* Header */}
-      <header
-        className={`sticky top-0 z-50 m-4 p-6 rounded-xl shadow-lg backdrop-blur-md transition-all duration-500 ease-in-out ${themeStyles.headerGradient}`}
-      >
+      <header className={`sticky top-0 z-50 m-4 p-6 rounded-xl shadow-lg backdrop-blur-md transition-all duration-500 ease-in-out ${themeStyles.headerGradient}`}>
         <div className="flex justify-between items-center">
           <div>
-            <h1
-              className="text-4xl font-extrabold transition-colors duration-500 ease-in-out"
-              style={{ color: themeStyles.textColor }}
-            >
+            <h1 className="text-4xl font-extrabold transition-colors duration-500 ease-in-out" style={{ color: themeStyles.textColor }}>
               MONCHIES BURGERS
             </h1>
-            <p
-              className="text-sm font-medium"
-              style={{ color: themeStyles.textColor, opacity: 0.8 }}
-            >
+            <p className="text-sm font-medium" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
               Del sabor a la perfección
             </p>
           </div>
@@ -241,9 +262,7 @@ const Menu = () => {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`transition-transform hover:scale-105 px-4 py-2 rounded-full font-bold shadow-lg ${
-                activeCategory === cat ? "scale-110" : ""
-              }`}
+              className={`transition-transform hover:scale-105 px-4 py-2 rounded-full font-bold shadow-lg ${activeCategory === cat ? "scale-110" : ""}`}
               style={{
                 background: activeCategory === cat ? `linear-gradient(45deg, ${yellowBase}, #D4AC0D)` : themeStyles.glassBg,
                 color: activeCategory === cat ? white : themeStyles.textColor,
@@ -260,7 +279,7 @@ const Menu = () => {
       <main className="flex-1 px-4 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {currentItems.map((item, index) => {
-            // Para bebidas, calculamos la cantidad ya agregada al carrito
+            // Para bebidas, calcular cantidad agregada
             const count =
               activeCategory === "Bebidas" && item.type === "direct"
                 ? cart.filter((cartItem) => cartItem.product.name === item.name).length
@@ -308,7 +327,7 @@ const Menu = () => {
                       borderRadius: "9999px",
                     }}
                   >
-                    {activeCategory === "Hamburguesas" ? (
+                    {(activeCategory === "Hamburguesas" || activeCategory === "Hotdogs") ? (
                       <>
                         <FaPlusCircle className="inline mr-2" />
                         Agregar al Carrito
@@ -348,7 +367,7 @@ const Menu = () => {
         </a>
       </footer>
 
-      {/* Popup de Personalización (Popup en lugar de modal tradicional) */}
+      {/* Popup de Personalización */}
       {selectedProduct && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white rounded-xl p-6 w-11/12 max-w-md shadow-xl transform transition-transform duration-500 scale-100">
@@ -381,10 +400,14 @@ const Menu = () => {
                   <p className="font-semibold mb-2">
                     {activeCategory === "Hamburguesas"
                       ? "Modificaciones"
+                      : activeCategory === "Hotdogs"
+                      ? "Modificaciones"
                       : "Modificaciones"}
                   </p>
                   {(activeCategory === "Hamburguesas"
                     ? modificationsOptionsHamburguesas
+                    : activeCategory === "Hotdogs"
+                    ? modificationsOptionsHotdogs
                     : modificationsOptions
                   ).map((option) => (
                     <div key={option} className="flex items-center mb-2">
@@ -409,7 +432,7 @@ const Menu = () => {
                 </div>
                 <div className="mb-4">
                   <p className="font-semibold mb-2">Extras Adicionales</p>
-                  {extrasOptions.map((option) => (
+                  {(activeCategory === "Hotdogs" ? extrasOptionsHotdogs : extrasOptions).map((option) => (
                     <div key={option} className="flex items-center mb-2">
                       <input
                         type="checkbox"
