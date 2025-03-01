@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { FaPlusCircle, FaShoppingCart, FaTrashAlt, FaWhatsapp } from "react-icons/fa";
+import { FaPlusCircle, FaShoppingCart, FaTrashAlt, FaWhatsapp, FaCheckCircle } from "react-icons/fa";
+import { MdWbSunny, MdNightsStay } from "react-icons/md";
 
 const Menu = () => {
   // Estados generales
@@ -11,6 +12,7 @@ const Menu = () => {
   const [selectedDrink, setSelectedDrink] = useState("");
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [showPopup, setShowPopup] = useState(false); // Para manejar el popup
 
   // Colores basados en tonos amarillos
   const yellowBase = "#F1C40F"; // Amarillo vibrante
@@ -18,7 +20,7 @@ const Menu = () => {
   const white = "#FFFFFF";
   const darkText = "#2C3E50";
 
-  // Temas (oscuro y claro) usando tonos amarillos
+  // Definición de temas (oscuro y claro) usando tonos amarillos
   const themesConfig = {
     dark: {
       backgroundColor: "#1F1F1F",
@@ -188,15 +190,26 @@ const Menu = () => {
   }, [activeCategory]);
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-500 ease-in-out" style={{ backgroundColor: themeStyles.backgroundColor }}>
+    <div
+      className="min-h-screen flex flex-col transition-colors duration-500 ease-in-out"
+      style={{ backgroundColor: themeStyles.backgroundColor }}
+    >
       {/* Header */}
-      <header className={`sticky top-0 z-50 m-4 p-6 rounded-xl shadow-lg backdrop-blur-md transition-all duration-500 ease-in-out ${themeStyles.headerGradient}`}>
+      <header
+        className={`sticky top-0 z-50 m-4 p-6 rounded-xl shadow-lg backdrop-blur-md transition-all duration-500 ease-in-out ${themeStyles.headerGradient}`}
+      >
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-extrabold transition-colors duration-500 ease-in-out" style={{ color: themeStyles.textColor }}>
+            <h1
+              className="text-4xl font-extrabold transition-colors duration-500 ease-in-out"
+              style={{ color: themeStyles.textColor }}
+            >
               MONCHIES BURGERS
             </h1>
-            <p className="text-sm font-medium" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
+            <p
+              className="text-sm font-medium"
+              style={{ color: themeStyles.textColor, opacity: 0.8 }}
+            >
               Del sabor a la perfección
             </p>
           </div>
@@ -206,15 +219,19 @@ const Menu = () => {
               className="p-3 rounded-full transition-transform hover:scale-110 shadow-lg"
               style={{ background: "linear-gradient(45deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))", border: `1px solid ${themeStyles.borderColor}` }}
             >
-              {theme === "dark" ? "☀" : "🌙"}
+              {theme === "dark" ? <MdNightsStay size={24} /> : <MdWbSunny size={24} />}
             </button>
             <button
               onClick={() => setShowCart(true)}
-              className="p-3 rounded-full transition-transform hover:scale-110 shadow-lg flex items-center"
+              className="p-3 rounded-full transition-transform hover:scale-110 shadow-lg relative"
               style={{ background: "linear-gradient(45deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))", border: `1px solid ${themeStyles.borderColor}` }}
             >
-              <FaShoppingCart className="mr-1" />
-              <span>Cart ({cart.length})</span>
+              <FaShoppingCart size={24} />
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {cart.length}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -224,7 +241,9 @@ const Menu = () => {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`transition-transform hover:scale-105 px-4 py-2 rounded-full font-bold shadow-lg ${activeCategory === cat ? "scale-110" : ""}`}
+              className={`transition-transform hover:scale-105 px-4 py-2 rounded-full font-bold shadow-lg ${
+                activeCategory === cat ? "scale-110" : ""
+              }`}
               style={{
                 background: activeCategory === cat ? `linear-gradient(45deg, ${yellowBase}, #D4AC0D)` : themeStyles.glassBg,
                 color: activeCategory === cat ? white : themeStyles.textColor,
@@ -240,57 +259,68 @@ const Menu = () => {
       {/* Main: Grid de Productos */}
       <main className="flex-1 px-4 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {currentItems.map((item, index) => (
-            <div
-              key={index}
-              className="transition-transform duration-300 hover:scale-110 relative p-6"
-              style={{
-                backgroundColor: themeStyles.glassBg,
-                border: `1px solid ${themeStyles.borderColor}`,
-                borderRadius: "1rem",
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <div className="text-center">
-                <div className="mb-4 text-7xl">{item.image}</div>
-                <h3 className="text-2xl font-bold mb-2" style={{ color: themeStyles.textColor }}>
-                  {item.name}
-                </h3>
-                <p className="mb-2" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
-                  {item.description}
-                </p>
-                <p className="text-xl font-bold mb-2" style={{ color: accentColor }}>
-                  {item.price}
-                </p>
-                <button
-                  onClick={() => {
-                    if (activeCategory === "Bebidas" && item.type === "direct") {
-                      // Para bebidas directas, se agregan al carrito sin modal
-                      setCart([...cart, { product: item, modifications: [], extras: [], selectedDrink: "" }]);
-                    } else {
-                      setSelectedProduct(item);
-                    }
-                  }}
-                  className="transition-transform hover:scale-105 shadow-lg"
-                  style={{
-                    background: "linear-gradient(45deg, #E74C3C, #C0392B)",
-                    color: white,
-                    padding: "0.75rem 1.5rem",
-                    borderRadius: "9999px",
-                  }}
-                >
-                  {activeCategory === "Hamburguesas" ? (
-                    <>
-                      <FaPlusCircle className="inline mr-2" />
-                      Agregar al Carrito
-                    </>
-                  ) : (
-                    "Pedir por WhatsApp"
-                  )}
-                </button>
+          {currentItems.map((item, index) => {
+            // Para bebidas, calculamos la cantidad ya agregada al carrito
+            const count =
+              activeCategory === "Bebidas" && item.type === "direct"
+                ? cart.filter((cartItem) => cartItem.product.name === item.name).length
+                : 0;
+            return (
+              <div
+                key={index}
+                className="transition-transform duration-300 hover:scale-110 relative p-6"
+                style={{
+                  backgroundColor: themeStyles.glassBg,
+                  border: `1px solid ${themeStyles.borderColor}`,
+                  borderRadius: "1rem",
+                  backdropFilter: "blur(10px)",
+                }}
+              >
+                {activeCategory === "Bebidas" && count > 0 && (
+                  <span className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center justify-center">
+                    <FaCheckCircle className="mr-1" /> {count}
+                  </span>
+                )}
+                <div className="text-center">
+                  <div className="mb-4 text-7xl">{item.image}</div>
+                  <h3 className="text-2xl font-bold mb-2" style={{ color: themeStyles.textColor }}>
+                    {item.name}
+                  </h3>
+                  <p className="mb-2" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
+                    {item.description}
+                  </p>
+                  <p className="text-xl font-bold mb-2" style={{ color: accentColor }}>
+                    {item.price}
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (activeCategory === "Bebidas" && item.type === "direct") {
+                        setCart([...cart, { product: item, modifications: [], extras: [], selectedDrink: "" }]);
+                      } else {
+                        setSelectedProduct(item);
+                      }
+                    }}
+                    className="transition-transform hover:scale-105 shadow-lg"
+                    style={{
+                      background: "linear-gradient(45deg, #E74C3C, #C0392B)",
+                      color: white,
+                      padding: "0.75rem 1.5rem",
+                      borderRadius: "9999px",
+                    }}
+                  >
+                    {activeCategory === "Hamburguesas" ? (
+                      <>
+                        <FaPlusCircle className="inline mr-2" />
+                        Agregar al Carrito
+                      </>
+                    ) : (
+                      "Pedir"
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 
@@ -303,11 +333,8 @@ const Menu = () => {
           backdropFilter: "blur(10px)",
         }}
       >
-        <p
-          className="text-sm font-medium"
-          style={{ color: themeStyles.textColor, opacity: 0.9 }}
-        >
-          by Ing Informatica Fabricio Regalado
+        <p className="text-sm font-medium" style={{ color: themeStyles.textColor, opacity: 0.9 }}>
+          Desarrollado por Ing Informatica Fabricio Regalado
         </p>
         <a
           href="https://wa.me/3411456773"
@@ -316,15 +343,15 @@ const Menu = () => {
           className="flex items-center gap-2 text-sm font-bold transition-transform hover:scale-105"
           style={{ color: accentColor }}
         >
-          <span style={{ fontSize: "1.2rem" }}>☏</span>
-          Tel: 341 145 6773
+          <FaWhatsapp size={20} />
+          <span>WhatsApp: 341 145 6773</span>
         </a>
       </footer>
 
-      {/* Modal de Personalización */}
+      {/* Popup de Personalización (Popup en lugar de modal tradicional) */}
       {selectedProduct && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-xl p-6 w-11/12 max-w-md shadow-xl">
+          <div className="bg-white rounded-xl p-6 w-11/12 max-w-md shadow-xl transform transition-transform duration-500 scale-100">
             <h2 className="text-2xl font-bold mb-4">Personaliza tu pedido</h2>
             <p className="mb-4">
               <strong>{selectedProduct.name}</strong> - {selectedProduct.price}
@@ -435,10 +462,10 @@ const Menu = () => {
         </div>
       )}
 
-      {/* Modal del Carrito */}
+      {/* Popup del Carrito */}
       {showCart && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-xl p-6 w-11/12 max-w-lg shadow-xl">
+          <div className="bg-white rounded-xl p-6 w-11/12 max-w-lg shadow-xl transform transition-transform duration-500 scale-100">
             <h2 className="text-2xl font-bold mb-4">¡Envía tu Pedido!</h2>
             {cart.length === 0 ? (
               <p className="mb-4">Tu carrito está vacío.</p>
@@ -499,7 +526,7 @@ const Menu = () => {
                   onClick={confirmCartOrder}
                   className="px-4 py-2 rounded bg-green-500 text-white shadow hover:bg-green-600 transition flex items-center gap-2"
                 >
-                  <FaWhatsapp /> Enviar Pedido
+                  <FaWhatsapp size={20} /> Enviar Pedido
                 </button>
               )}
             </div>
