@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FaPlusCircle, FaShoppingCart, FaTrashAlt, FaWhatsapp } from "react-icons/fa";
 
 const Menu = () => {
   // Estados generales
@@ -39,7 +40,7 @@ const Menu = () => {
 
   const themeStyles = themesConfig[theme];
 
-  // Opciones para personalización
+  // Opciones para personalización (Modificaciones)
   const modificationsOptions = [
     "Sin cebolla",
     "Sin queso",
@@ -48,6 +49,18 @@ const Menu = () => {
     "Extra carne",
   ];
 
+  // Opciones específicas para Hamburguesas
+  const modificationsOptionsHamburguesas = [
+    "Sin queso",
+    "Sin cebolla",
+    "Sin pepinillos",
+    "Sin jitomate",
+    "Sin catsup",
+    "Sin mostaza",
+    "Sin mayonesa",
+  ];
+
+  // Opciones de Extras (para productos que no sean bebidas)
   const extrasOptions = [
     "Queso Amarillo",
     "Queso Manchego",
@@ -75,7 +88,6 @@ const Menu = () => {
         selectedDrink: customization.selectedDrink || "",
       };
       setCart([...cart, item]);
-      // Para depuración:
       console.log("Producto agregado:", item);
       setSelectedProduct(null);
       setSelectedModifications([]);
@@ -84,22 +96,44 @@ const Menu = () => {
     }
   };
 
+  // Función para eliminar un producto del carrito
+  const removeFromCart = (indexToRemove) => {
+    setCart(cart.filter((_, index) => index !== indexToRemove));
+  };
+
+  // Función para calcular el total de un ítem (suponiendo $10 por cada extra)
+  const calculateItemTotal = (item) => {
+    const base = parseFloat(item.product.price.replace("$", ""));
+    const extrasCost = item.extras.length * 10;
+    return base + extrasCost;
+  };
+
+  // Función para calcular el total del carrito
+  const calculateCartTotal = () =>
+    cart.reduce((acc, item) => acc + calculateItemTotal(item), 0);
+
   // Función para confirmar el pedido del carrito
   const confirmCartOrder = () => {
     if (cart.length === 0) return;
     let message = "Hola, quiero pedir:\n";
     cart.forEach((item) => {
-      const mods = item.modifications.length > 0 ? " (" + item.modifications.join(", ") + ")" : "";
-      const extras = item.extras.length > 0 ? " Extras: " + item.extras.join(", ") : "";
+      const mods =
+        item.modifications.length > 0 ? " (" + item.modifications.join(", ") + ")" : "";
+      const extras =
+        item.extras.length > 0 ? " Extras: " + item.extras.join(", ") : "";
       const drink = item.selectedDrink ? " Refresco: " + item.selectedDrink : "";
-      message += `- ${item.product.name}${mods}${extras}${drink} - ${item.product.price}\n`;
+      const itemTotal = calculateItemTotal(item);
+      message += `- ${item.product.name}${mods}${extras}${drink} - ${item.product.price} + Extras: $${item.extras.length * 10} = $${itemTotal}\n`;
     });
+    const total = calculateCartTotal();
+    message += `\nTotal: $${total}\n\nPor favor, indique su dirección.`;
     orderWhatsApp(message);
     setCart([]);
     setShowCart(false);
   };
 
-  // Datos del menú
+  // Datos del menú, divididos en categorías.
+  // En Bebidas, cada refresco se maneja como una card independiente.
   const menuData = {
     Hamburguesas: [
       { name: "Hamburguesa Res", price: "$65", image: "🍔", description: "Clásica con carne de res" },
@@ -176,10 +210,11 @@ const Menu = () => {
             </button>
             <button
               onClick={() => setShowCart(true)}
-              className="p-3 rounded-full transition-transform hover:scale-110 shadow-lg"
+              className="p-3 rounded-full transition-transform hover:scale-110 shadow-lg flex items-center"
               style={{ background: "linear-gradient(45deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))", border: `1px solid ${themeStyles.borderColor}` }}
             >
-              Cart ({cart.length})
+              <FaShoppingCart className="mr-1" />
+              <span>Cart ({cart.length})</span>
             </button>
           </div>
         </div>
@@ -218,12 +253,19 @@ const Menu = () => {
             >
               <div className="text-center">
                 <div className="mb-4 text-7xl">{item.image}</div>
-                <h3 className="text-2xl font-bold mb-2" style={{ color: themeStyles.textColor }}>{item.name}</h3>
-                <p className="mb-2" style={{ color: themeStyles.textColor, opacity: 0.8 }}>{item.description}</p>
-                <p className="text-xl font-bold mb-2" style={{ color: accentColor }}>{item.price}</p>
+                <h3 className="text-2xl font-bold mb-2" style={{ color: themeStyles.textColor }}>
+                  {item.name}
+                </h3>
+                <p className="mb-2" style={{ color: themeStyles.textColor, opacity: 0.8 }}>
+                  {item.description}
+                </p>
+                <p className="text-xl font-bold mb-2" style={{ color: accentColor }}>
+                  {item.price}
+                </p>
                 <button
                   onClick={() => {
                     if (activeCategory === "Bebidas" && item.type === "direct") {
+                      // Para bebidas directas, se agregan al carrito sin modal
                       setCart([...cart, { product: item, modifications: [], extras: [], selectedDrink: "" }]);
                     } else {
                       setSelectedProduct(item);
@@ -237,7 +279,14 @@ const Menu = () => {
                     borderRadius: "9999px",
                   }}
                 >
-                  Pedir por WhatsApp
+                  {activeCategory === "Hamburguesas" ? (
+                    <>
+                      <FaPlusCircle className="inline mr-2" />
+                      Agregar al Carrito
+                    </>
+                  ) : (
+                    "Pedir por WhatsApp"
+                  )}
                 </button>
               </div>
             </div>
@@ -246,18 +295,27 @@ const Menu = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-8 py-4 flex flex-col items-center justify-center gap-2 shadow-md transition-colors duration-500 ease-in-out"
+      <footer
+        className="mt-8 py-4 flex flex-col items-center justify-center gap-2 shadow-md transition-colors duration-500 ease-in-out"
         style={{
           background: themeStyles.footerGradient,
           borderTop: `1px solid ${themeStyles.borderColor}`,
           backdropFilter: "blur(10px)",
-        }}>
-        <p className="text-sm font-medium" style={{ color: themeStyles.textColor, opacity: 0.9 }}>
+        }}
+      >
+        <p
+          className="text-sm font-medium"
+          style={{ color: themeStyles.textColor, opacity: 0.9 }}
+        >
           by Ing Informatica Fabricio Regalado
         </p>
-        <a href="https://wa.me/3411456773" target="_blank" rel="noopener noreferrer"
+        <a
+          href="https://wa.me/3411456773"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-2 text-sm font-bold transition-transform hover:scale-105"
-          style={{ color: accentColor }}>
+          style={{ color: accentColor }}
+        >
           <span style={{ fontSize: "1.2rem" }}>☏</span>
           Tel: 341 145 6773
         </a>
@@ -284,15 +342,24 @@ const Menu = () => {
                       checked={selectedDrink === option}
                       onChange={() => setSelectedDrink(option)}
                     />
-                    <label htmlFor={`drink-${option}`} className="text-sm">{option}</label>
+                    <label htmlFor={`drink-${option}`} className="text-sm">
+                      {option}
+                    </label>
                   </div>
                 ))}
               </div>
             ) : (
               <>
                 <div className="mb-4">
-                  <p className="font-semibold mb-2">Modificaciones</p>
-                  {modificationsOptions.map((option) => (
+                  <p className="font-semibold mb-2">
+                    {activeCategory === "Hamburguesas"
+                      ? "Modificaciones"
+                      : "Modificaciones"}
+                  </p>
+                  {(activeCategory === "Hamburguesas"
+                    ? modificationsOptionsHamburguesas
+                    : modificationsOptions
+                  ).map((option) => (
                     <div key={option} className="flex items-center mb-2">
                       <input
                         type="checkbox"
@@ -307,7 +374,9 @@ const Menu = () => {
                           }
                         }}
                       />
-                      <label htmlFor={`mod-${option}`} className="text-sm">{option}</label>
+                      <label htmlFor={`mod-${option}`} className="text-sm">
+                        {option}
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -328,7 +397,9 @@ const Menu = () => {
                           }
                         }}
                       />
-                      <label htmlFor={`extra-${option}`} className="text-sm">{option}</label>
+                      <label htmlFor={`extra-${option}`} className="text-sm">
+                        {option}
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -373,29 +444,62 @@ const Menu = () => {
               <p className="mb-4">Tu carrito está vacío.</p>
             ) : (
               <div className="mb-4">
-                {cart.map((item, idx) => (
-                  <div key={idx} className="mb-2 border-b pb-2">
-                    <p className="font-semibold">{item.product.name} - {item.product.price}</p>
-                    {item.modifications.length > 0 && (
-                      <p className="text-sm">Modificaciones: {item.modifications.join(", ")}</p>
-                    )}
-                    {item.extras.length > 0 && (
-                      <p className="text-sm">Extras: {item.extras.join(", ")}</p>
-                    )}
-                    {item.selectedDrink && (
-                      <p className="text-sm">Refresco: {item.selectedDrink}</p>
-                    )}
-                  </div>
-                ))}
+                {cart.map((item, idx) => {
+                  const basePrice = parseFloat(item.product.price.replace("$", ""));
+                  const extrasCost = item.extras.length * 10;
+                  const itemTotal = basePrice + extrasCost;
+                  return (
+                    <div key={idx} className="mb-2 border-b pb-2 flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold">
+                          {item.product.name} - {item.product.price}
+                        </p>
+                        {item.modifications.length > 0 && (
+                          <p className="text-sm">Modificaciones: {item.modifications.join(", ")}</p>
+                        )}
+                        {item.extras.length > 0 && (
+                          <>
+                            <p className="text-sm">Extras: {item.extras.join(", ")}</p>
+                            <p className="text-sm">Costo Extras: ${extrasCost}</p>
+                          </>
+                        )}
+                        {item.selectedDrink && (
+                          <p className="text-sm">Refresco: {item.selectedDrink}</p>
+                        )}
+                        <p className="text-sm font-bold">Total: ${itemTotal}</p>
+                      </div>
+                      <button
+                        onClick={() => removeFromCart(idx)}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    </div>
+                  );
+                })}
+                <div className="mt-4 font-bold">
+                  Total Orden: $
+                  {cart.reduce(
+                    (acc, item) =>
+                      acc + parseFloat(item.product.price.replace("$", "")) + item.extras.length * 10,
+                    0
+                  )}
+                </div>
               </div>
             )}
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowCart(false)} className="px-4 py-2 rounded shadow hover:shadow-md transition">
+              <button
+                onClick={() => setShowCart(false)}
+                className="px-4 py-2 rounded shadow hover:shadow-md transition"
+              >
                 Cerrar
               </button>
               {cart.length > 0 && (
-                <button onClick={confirmCartOrder} className="px-4 py-2 rounded bg-green-500 text-white shadow hover:bg-green-600 transition">
-                  Enviar Pedido
+                <button
+                  onClick={confirmCartOrder}
+                  className="px-4 py-2 rounded bg-green-500 text-white shadow hover:bg-green-600 transition flex items-center gap-2"
+                >
+                  <FaWhatsapp /> Enviar Pedido
                 </button>
               )}
             </div>
