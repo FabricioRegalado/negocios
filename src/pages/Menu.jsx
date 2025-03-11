@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { 
-  FaPlusCircle, 
-  FaShoppingCart, 
-  FaTrashAlt, 
-  FaWhatsapp, 
-  FaCheckCircle, 
-  FaSpinner 
+import {
+  FaPlusCircle,
+  FaShoppingCart,
+  FaTrashAlt,
+  FaWhatsapp,
+  FaCheckCircle,
+  FaSpinner,
+  FaInstagram, 
+  FaLinkedin
 } from "react-icons/fa";
 import { MdWbSunny, MdNightsStay } from "react-icons/md";
 
@@ -493,8 +495,8 @@ const Menu = () => {
             >
               {(activeCategory === "Hamburguesas" || activeCategory === "Hotdogs")
                 ? <>
-                    <FaPlusCircle className="inline mr-2" /> Agregar al Carrito
-                  </>
+                  <FaPlusCircle className="inline mr-2" /> Agregar al Carrito
+                </>
                 : "Pedir"}
             </button>
           )}
@@ -579,21 +581,56 @@ const Menu = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-8 py-4 flex flex-col items-center justify-center gap-2 shadow-md transition-colors duration-500 ease-in-out"
-              style={{
-                background: themeStyles.footerGradient,
-                borderTop: `1px solid ${themeStyles.borderColor}`,
-                backdropFilter: "blur(10px)",
-              }}>
-        <p className="text-sm font-medium" style={{ color: themeStyles.textColor, opacity: 0.9 }}>
-          Desarrollado por Ing Informatica Fabricio Regalado
-        </p>
-        <a href="https://wa.me/3411456773" target="_blank" rel="noopener noreferrer"
-           className="flex items-center gap-2 text-sm font-bold transition-transform hover:scale-105"
-           style={{ color: accentColor }}>
-          <FaWhatsapp size={20} /><span>WhatsApp: 341 145 6773</span>
-        </a>
-      </footer>
+      <footer className="relative pt-16 pb-8 bg-gradient-to-r from-[#F39C12] to-[#F1C40F] text-white overflow-hidden shadow-lg">
+      {/* Onda decorativa en la parte superior */}
+      <div className="absolute top-0 left-0 w-full -translate-y-1">
+        <svg className="w-full h-16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path
+            d="M0,0 C150,100 350,0 500,50 C650,100 850,0 1000,50 L1000,0 L0,0 Z"
+            fill="white"
+            opacity="0.2"
+          />
+        </svg>
+      </div>
+      <div className="relative container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center justify-between">
+          <div className="text-center md:text-left mb-4 md:mb-0">
+            <p className="text-xl font-bold">Ing Informatica Fabricio Regalado</p>
+            <p className="text-sm">
+              © {new Date().getFullYear()} Todos los derechos reservados
+            </p>
+          </div>
+          <div className="flex items-center gap-6">
+            <a
+              href="https://wa.me/3411456773"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:scale-110 transition-transform"
+            >
+              <FaWhatsapp size={28} />
+              <span className="text-xl font-bold">341 145 6773</span>
+            </a>
+            <a
+              href="https://www.instagram.com/fabricio_ouo/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:scale-110 transition-transform"
+            >
+              <FaInstagram size={28} />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/oscar-fabricio-regalado-p%C3%A9rez-90181b225/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:scale-110 transition-transform"
+            >
+              <FaLinkedin size={28} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
 
       {/* Popup de Personalización */}
       {selectedProduct && (
@@ -607,7 +644,7 @@ const Menu = () => {
                 {selectedProduct.drinkOptions.map((option) => (
                   <div key={option} className="flex items-center mb-2">
                     <input type="radio" id={`drink-${option}`} name="drinkOption" className="mr-2"
-                           checked={selectedDrink === option} onChange={() => setSelectedDrink(option)} />
+                      checked={selectedDrink === option} onChange={() => setSelectedDrink(option)} />
                     <label htmlFor={`drink-${option}`} className="text-sm">{option}</label>
                   </div>
                 ))}
@@ -621,19 +658,19 @@ const Menu = () => {
                   {(activeCategory === "Hamburguesas"
                     ? modificationsOptionsHamburguesas
                     : activeCategory === "Hotdogs"
-                    ? modificationsOptionsHotdogs
-                    : modificationsOptions
+                      ? modificationsOptionsHotdogs
+                      : modificationsOptions
                   ).map((option) => (
                     <div key={option} className="flex items-center mb-2">
                       <input type="checkbox" id={`mod-${option}`} className="mr-2"
-                             checked={selectedModifications.includes(option)}
-                             onChange={() => {
-                               if (selectedModifications.includes(option)) {
-                                 setSelectedModifications(selectedModifications.filter((mod) => mod !== option));
-                               } else {
-                                 setSelectedModifications([...selectedModifications, option]);
-                               }
-                             }} />
+                        checked={selectedModifications.includes(option)}
+                        onChange={() => {
+                          if (selectedModifications.includes(option)) {
+                            setSelectedModifications(selectedModifications.filter((mod) => mod !== option));
+                          } else {
+                            setSelectedModifications([...selectedModifications, option]);
+                          }
+                        }} />
                       <label htmlFor={`mod-${option}`} className="text-sm">{option}</label>
                     </div>
                   ))}
@@ -643,14 +680,14 @@ const Menu = () => {
                   {(activeCategory === "Hotdogs" ? extrasOptionsHotdogs : extrasOptions).map((option) => (
                     <div key={option.name || option} className="flex items-center mb-2">
                       <input type="checkbox" id={`extra-${option.name || option}`} className="mr-2"
-                             checked={selectedExtras.includes(option.name || option)}
-                             onChange={() => {
-                               if (selectedExtras.includes(option.name || option)) {
-                                 setSelectedExtras(selectedExtras.filter((ex) => ex !== (option.name || option)));
-                               } else {
-                                 setSelectedExtras([...selectedExtras, option.name || option]);
-                               }
-                             }} />
+                        checked={selectedExtras.includes(option.name || option)}
+                        onChange={() => {
+                          if (selectedExtras.includes(option.name || option)) {
+                            setSelectedExtras(selectedExtras.filter((ex) => ex !== (option.name || option)));
+                          } else {
+                            setSelectedExtras([...selectedExtras, option.name || option]);
+                          }
+                        }} />
                       <label htmlFor={`extra-${option.name || option}`} className="text-sm">
                         {option.name || option} {option.price ? `- ${option.price}` : ""}
                       </label>
