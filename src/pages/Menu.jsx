@@ -595,7 +595,7 @@ const Menu = () => {
       <div className="relative container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="text-center md:text-left mb-4 md:mb-0">
-            <p className="text-xl font-bold">Ing Informatica Fabricio Regalado</p>
+            <p className="text-xl font-bold">Ing. Informático Fabricio Regalado</p>
             <p className="text-sm">
               © {new Date().getFullYear()} Todos los derechos reservados
             </p>
