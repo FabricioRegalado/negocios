@@ -229,76 +229,82 @@ const Menu = () => {
   const menuData = {
     Hamburguesas: [
       {
+        name: "Hamburguesa 3 Carnes",
+        price: "$100",
+        image: "🍔",
+        description: "Tres jugosas carnes de res con una mezcla de quesos blanco, amarillo y asadero, acompañadas de cebolla guisada."
+      },
+      {
         name: "Hamburguesa de Res",
         price: "$65",
         image: "🍔",
-        description: "Carne de Res y queso amarillo."
+        description: "Clásica hamburguesa de res con queso amarillo."
       },
       {
         name: "Hamburguesa Tropical",
         price: "$75",
         image: "🍔",
-        description: "Carne de res, queso amarillo, cebolla guisada, piña, verdura y queso manchego."
+        description: "Carne de res con queso amarillo, cebolla guisada, piña, verdura fresca y queso manchego."
       },
       {
         name: "Hamburguesa de Pepperoni",
         price: "$80",
         image: "🍔",
-        description: "Carne de res, queso amarillo, cebolla guisada, salsa de pizza, queso de pizza y pepperoni."
+        description: "Carne de res con queso amarillo, cebolla guisada, salsa de pizza, queso de pizza y pepperoni."
       },
       {
         name: "Hamburguesa de Res Doble",
         price: "$85",
         image: "🍔",
-        description: "Carne, queso amarillo, otra carne de res, queso blanco, cebolla guisada, verdura y queso blanco derretido."
+        description: "Doble carne de res con queso amarillo, queso blanco, cebolla guisada, verdura y queso blanco derretido."
       },
       {
         name: "Hamburguesa Porquin",
         price: "$90",
         image: "🍔",
-        description: "Carne de res, queso amarillo, salchicha de asar, tocino, cebolla guisada, frijoles, chorizo, pepperoni y queso derretido."
+        description: "Carne de res con queso amarillo, salchicha de asar, tocino, cebolla guisada, frijoles, chorizo, pepperoni y queso derretido."
       },
       {
         name: "Hamburguesa Buffalo",
         price: "$75",
         image: "🍔",
-        description: "Carne de res, verdura, queso derretido con salsa de buffalo."
+        description: "Carne de res con verdura y queso derretido con salsa buffalo."
       },
       {
         name: "Hamburguesa BBQ",
         price: "$70",
         image: "🍔",
-        description: "Carne de res, verdura, queso derretido, con salsa de BBQ."
+        description: "Carne de res con verdura y queso derretido con salsa BBQ."
       },
       {
         name: "Hamburguesa Mar y Tierra",
         price: "$85",
         image: "🍔",
-        description: "Carne de res, queso amarillo, camarón y queso asadero."
+        description: "Carne de res con queso amarillo, camarón y queso asadero."
       },
       {
         name: "Hamburguesa Hawaiana",
         price: "$75",
         image: "🍔",
-        description: "Carne de res, queso amarillo, jamón, piña y queso asadero."
+        description: "Carne de res con queso amarillo, jamón, piña y queso asadero."
       },
       {
         name: "Hamburguesa Piña Habanero",
         price: "$80",
         image: "🍔",
-        description: "Carne de res, queso amarillo, piña y salsa de piña habanero."
+        description: "Carne de res con queso amarillo, piña y salsa de piña habanero."
       },
       {
         name: "Hamburguesa Mango Habanero",
         price: "$80",
         image: "🍔",
-        description: "Carne de res, queso amarillo, queso asadero y salsa mango habanero."
+        description: "Carne de res con queso amarillo, queso asadero y salsa mango habanero."
       },
       {
         name: "Hamburguesa Champiñones",
         price: "$70",
         image: "🍔",
-        description: "Carne de res, queso amarillo, champiñones y queso asadero."
+        description: "Carne de res con queso amarillo, champiñones y queso asadero."
       },
     ],
     Hotdogs: [
@@ -306,25 +312,25 @@ const Menu = () => {
         name: "Hotdog Normal",
         price: "$30",
         image: "🌭",
-        description: "Salchicha y verdura con cebolla guisada."
+        description: "Salchicha con verdura y cebolla guisada."
       },
       {
         name: "Hotdog Camarón",
         price: "$40",
         image: "🌭",
-        description: "Salchicha camarón y verdura con cebolla guisada."
+        description: "Salchicha con camarón, verdura y cebolla guisada."
       },
       {
         name: "Hotdog Porquin",
         price: "$45",
         image: "🌭",
-        description: "Salchicha para asar, queso asadero, tocino, jamón, chorizo, pepperoni, frijol, cebolla guisada y verdura."
+        description: "Salchicha para asar con queso asadero, tocino, jamón, chorizo, pepperoni, frijol, cebolla guisada y verdura."
       },
       {
         name: "Hotdog Jumbo",
         price: "$50",
         image: "🌭",
-        description: "Salchicha de asar, cebolla guisada y verdura."
+        description: "Salchicha de asar con cebolla guisada y verdura."
       },
       {
         name: "Chile Dogo",
@@ -336,31 +342,31 @@ const Menu = () => {
         name: "QuesiDogo",
         price: "$50",
         image: "🌭",
-        description: "Salchicha, queso asadero, cebolla guisada y verdura."
+        description: "Salchicha con queso asadero, cebolla guisada y verdura."
       },
       {
         name: "PizzaDogo",
         price: "$55",
         image: "🌭",
-        description: "Salchicha, queso asadero, pepperoni, cebolla guisada y verdura."
+        description: "Salchicha con queso asadero, pepperoni, cebolla guisada y verdura."
       },
       {
         name: "TostiDogo",
         price: "$55",
         image: "🌭",
-        description: "Salchicha, cebolla guisada y verdura con tostitos."
+        description: "Salchicha con cebolla guisada y verdura, servida con tostitos."
       },
       {
         name: "Dogo Embarazado",
         price: "$60",
         image: "🌭",
-        description: "Salchicha para asar con salchicha en medio, cebolla guisada y verdura."
+        description: "Salchicha para asar con otra salchicha en medio, cebolla guisada y verdura."
       },
       {
         name: "Res Dogo",
         price: "$60",
         image: "🌭",
-        description: "Salchicha, queso asadero y carne de res, cebolla guisada y verdura."
+        description: "Salchicha con queso asadero, carne de res, cebolla guisada y verdura."
       },
       {
         name: "Mango Dogo",
@@ -372,13 +378,13 @@ const Menu = () => {
         name: "Dogo BBQ",
         price: "$60",
         image: "🌭",
-        description: "Salchicha con cebolla guisada y salsa de BBQ."
+        description: "Salchicha con cebolla guisada y salsa BBQ."
       },
       {
         name: "Dogo Buffalo",
         price: "$60",
         image: "🌭",
-        description: "Salchicha con cebolla guisada y salsa de Buffalo."
+        description: "Salchicha con cebolla guisada y salsa buffalo."
       },
     ],
     Alitas: [
@@ -386,7 +392,7 @@ const Menu = () => {
         name: "Alitas (10 piezas)",
         price: "$80",
         image: "🍗",
-        description: "PROXIMAMENTE"
+        description: "¡Próximamente disponibles!"
       },
     ],
     Extras: [
