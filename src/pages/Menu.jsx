@@ -93,7 +93,7 @@ const Menu = () => {
 
   // Función para abrir WhatsApp
   const orderWhatsApp = (message) =>
-    window.open("https://wa.me/3411456773?text=" + encodeURIComponent(message), "_blank");
+    window.open("https://wa.me/3411558024?text=" + encodeURIComponent(message), "_blank");
 
   // Opciones de personalización
   const modificationsOptions = [
