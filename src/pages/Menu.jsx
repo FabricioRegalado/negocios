@@ -278,7 +278,7 @@ const Menu = () => {
       },
       {
         name: "Hamburguesa Mar y Tierra",
-        price: "$85",
+        price: "$90",
         image: "🍔",
         description: "Carne de res con queso amarillo, camarón y queso asadero."
       },
@@ -310,19 +310,19 @@ const Menu = () => {
     Hotdogs: [
       {
         name: "Hotdog Normal",
-        price: "$30",
+        price: "$40",
         image: "🌭",
         description: "Salchicha con verdura y cebolla guisada."
       },
       {
         name: "Hotdog Camarón",
-        price: "$40",
+        price: "$60",
         image: "🌭",
         description: "Salchicha con camarón, verdura y cebolla guisada."
       },
       {
         name: "Hotdog Porquin",
-        price: "$45",
+        price: "$60",
         image: "🌭",
         description: "Salchicha para asar con queso asadero, tocino, jamón, chorizo, pepperoni, frijol, cebolla guisada y verdura."
       },
